@@ -25,48 +25,116 @@
             --swipe-delete-bg: var(--negative-color);
             --swipe-edit-bg: var(--positive-color);
             --link-color: #42a5f5;
+            --card-skin-1-bg: url('assets/gradient_type_v01.png');
+            --card-skin-2-bg: url('assets/gradient_type_v02.png');
+            --card-skin-default-bg: linear-gradient(160deg, #404040, #2d2d2d);
+            --card-glass-effect-bg: rgba(45, 45, 45, 0.6);
+            --card-glass-border: rgba(255, 255, 255, 0.1);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: var(--bg-color); color: var(--text-color); font-family: var(--font-family); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 20px; font-size: 14px; }
-        .container { background-color: #2a2a2a; border-radius: 8px; padding: 20px; max-width: 400px; width: 100%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); overflow: hidden; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px;
+            font-size: 14px;
+        }
+        .container {
+            max-width: 400px;
+            width: 100%;
+            overflow: hidden;
+        }
         header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
         .header-main { flex-grow: 1; } .header-main h1 { font-size: 2.5em; font-weight: bold; line-height: 1; margin-bottom: 2px; } .header-main p { color: var(--text-secondary-color); font-size: 0.9em; }
         .header-actions { display: flex; align-items: center; flex-shrink: 0; }
         .header-actions button { background-color: var(--button-bg); color: var(--text-color); border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85em; margin-left: 8px; transition: background-color 0.2s ease; white-space: nowrap; } .header-actions button:hover { background-color: var(--button-hover-bg); }
-        /* Old price-info styles can be removed if not needed */
-        /* .price-info { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: flex-start; }
-        .price-block { flex: 1; padding-right: 5px; } .price-block:last-child { padding-right: 0; text-align: right; display: flex; flex-direction: column; align-items: flex-end; } .price-block .value-line { display: flex; align-items: baseline; justify-content: flex-start; min-height: 1.2em; } .price-block:last-child .value-line { justify-content: flex-end; } .price-block .price { font-size: 1.8em; font-weight: 500; line-height: 1; margin-right: 5px; } .price-block .change { font-size: 1.1em; font-weight: 500; line-height: 1; } .price-block .change.positive { color: var(--positive-color); } .price-block .change.negative { color: var(--negative-color); } .price-block .label { display: block; color: var(--text-secondary-color); font-size: 0.9em; margin-top: 4px; } */
+
         .currency-selector-container { color: var(--text-secondary-color); font-size: 0.9em; margin-bottom: 20px; display: flex; align-items: center; } .currency-selector-container label { margin-right: 5px; }
         #currencySelector { background-color: var(--button-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 4px; padding: 2px 5px; font-size: 1em; cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; } #currencySelector:focus { outline: none; box-shadow: none; }
         .chart-area { height: 200px; margin-bottom: 25px; position: relative; }
         .transaction-list { margin-bottom: 20px; min-height: 80px; }
         .transaction-item-wrapper { position: relative; overflow: hidden; background-color: var(--modal-content-bg); user-select: none; touch-action: pan-y; border-bottom: 1px solid var(--border-color); } .transaction-item-wrapper:last-child { border-bottom: none;}
         .transaction-item-swipe-background { position: absolute; top: 0; bottom: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: white; font-weight: bold; opacity: 0; transition: opacity 0.1s ease-out; } .swipe-delete { background-color: var(--swipe-delete-bg); justify-content: flex-end; } .swipe-edit { background-color: var(--swipe-edit-bg); justify-content: flex-start; }
-        .transaction-item { display: grid; grid-template-columns: auto 1fr auto auto; gap: 10px; padding: 12px 10px; align-items: center; font-size: 0.95em; background-color: var(--modal-content-bg); position: relative; transition: transform 0.1s ease-out; cursor: grab; } .transaction-item.dragging { cursor: grabbing; transition: none; } .transaction-item span:nth-child(1) { font-weight: 600; } .transaction-item span:nth-child(2) { text-align: right; font-weight: 600; } .transaction-item span.result.positive { color: var(--positive-color); } .transaction-item span.result.negative { color: var(--negative-color); } .transaction-item span.result.neutral { color: var(--neutral-color); } .transaction-item span:nth-child(3) { color: var(--text-secondary-color); font-size: 0.85em; text-align: right; } .transaction-item span:nth-child(4) { text-align: right; font-weight: 500; min-width: 50px; } .no-transactions { color: var(--text-secondary-color); text-align: center; padding: 20px 0; font-style: italic; }
+        .transaction-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: 10px;
+            padding: 12px 10px;
+            align-items: baseline;
+            font-size: 0.95em;
+            background-color: var(--modal-content-bg);
+            position: relative;
+            transition: transform 0.1s ease-out;
+            cursor: grab;
+        }
+        .transaction-item.no-result {
+            grid-template-columns: auto 1fr auto;
+        }
+        .transaction-item.no-result span:nth-child(2) {
+             display: none;
+        }
+        .transaction-item.no-result span:nth-child(3) {
+            text-align: right;
+        }
+        .transaction-item.dragging { cursor: grabbing; transition: none; }
+        .transaction-item span:nth-child(1) { font-weight: 600; }
+        .transaction-item span:nth-child(2) { text-align: right; font-weight: 600; }
+        .transaction-item span.result.positive { color: var(--positive-color); }
+        .transaction-item span.result.negative { color: var(--negative-color); }
+        .transaction-item span.result.neutral { color: var(--neutral-color); }
+        .transaction-item span:nth-child(3) { color: var(--text-secondary-color); font-size: 0.85em; }
+        .transaction-item span:nth-child(4) { text-align: right; font-weight: 500; min-width: 50px; }
+        .no-transactions { color: var(--text-secondary-color); text-align: center; padding: 20px 0; font-style: italic; }
         footer p { color: var(--link-color); font-size: 0.9em; display: block; text-align: left; margin-top: 10px; }
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: var(--modal-bg); align-items: center; justify-content: center; } .modal-content { background-color: var(--modal-content-bg); margin: auto; padding: 25px; border: 1px solid var(--border-color); width: 80%; max-width: 450px; border-radius: 8px; color: var(--text-color); box-shadow: 0 5px 15px rgba(0,0,0,0.5); } .modal-content h2 { margin-top: 0; margin-bottom: 20px; font-weight: 500; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; } .modal-content label { display: block; margin-bottom: 5px; font-size: 0.9em; color: var(--text-secondary-color); } .modal-content input[type="text"], .modal-content input[type="number"], .modal-content input[type="datetime-local"], .modal-content select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--button-bg); color: var(--text-color); font-size: 1em; } .modal-content input[type="number"]::-webkit-inner-spin-button, .modal-content input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; } .modal-content input[type="number"] { -moz-appearance: textfield; } .modal-actions { text-align: right; margin-top: 20px; } .modal-actions button { background-color: var(--button-bg); color: var(--text-color); border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; font-size: 0.9em; margin-left: 10px; transition: background-color 0.2s ease; } .modal-actions button.primary { background-color: var(--positive-color); color: #fff; } .modal-actions button.primary:hover { background-color: #1e8e84; } .modal-actions button:hover { background-color: var(--button-hover-bg); } .close-button { color: var(--text-secondary-color); float: right; font-size: 24px; font-weight: bold; line-height: 1; cursor: pointer; margin-top: -10px; } .close-button:hover, .close-button:focus { color: var(--text-color); text-decoration: none; }
 
-        /* --- START: Finance Card Styles --- */
         .finance-card {
-            background: linear-gradient(160deg, #404040, #2d2d2d); /* Dark gradient background */
-            border-radius: 15px; /* Rounded corners */
+            border-radius: 15px;
             padding: 20px;
             color: var(--text-color);
             position: relative;
-            margin-bottom: 25px; /* Spacing below card */
+            margin-bottom: 25px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            overflow: hidden; /* Keep elements inside rounded corners */
+            overflow: hidden;
             font-family: var(--font-family);
+            cursor: grab;
+            user-select: none;
+            touch-action: pan-y;
+            transition: background 0.5s ease-in-out;
+            background-color: var(--card-glass-effect-bg);
+            border: 1px solid var(--card-glass-border);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .finance-card.skin-default {
+            background-image: var(--card-skin-default-bg);
+            background-size: cover;
+            background-position: center;
+        }
+        .finance-card.skin-1 {
+            background-image: var(--card-skin-1-bg);
+            background-size: cover;
+            background-position: center;
+        }
+        .finance-card.skin-2 {
+            background-image: var(--card-skin-2-bg);
+            background-size: cover;
+            background-position: center;
         }
 
         .finance-card .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px; /* Space below header */
+            margin-bottom: 20px;
         }
 
-        /* Mastercard-like logo using pseudo-elements */
         .finance-card .card-logo {
             width: 45px;
             height: 28px;
@@ -83,47 +151,41 @@
         }
         .finance-card .card-logo::before {
             left: 0;
-            background-color: rgba(255, 255, 255, 0.4); /* Semi-transparent white/grey */
+            background-color: rgba(255, 255, 255, 0.4);
             z-index: 1;
         }
         .finance-card .card-logo::after {
-            left: 17px; /* Overlap */
-            background-color: rgba(255, 255, 255, 0.3); /* Slightly different transparency */
+            left: 17px;
+            background-color: rgba(255, 255, 255, 0.3);
             z-index: 2;
         }
 
-        .finance-card .card-wallet-icon svg {
-            display: block; /* Prevents extra space below SVG */
-            color: rgba(255, 255, 255, 0.8); /* White icon color */
-        }
-
         .finance-card .card-body {
-            margin-bottom: 25px; /* Space below main balance */
+            margin-bottom: 25px;
             text-align: left;
         }
 
         .finance-card .card-balance-primary {
             display: flex;
             align-items: baseline;
-            margin-bottom: 4px; /* Space between value and label */
+            margin-bottom: 4px;
         }
 
         .finance-card .card-balance-primary #totalCapitalization {
-            font-size: 2.3em; /* Larger font for main balance */
+            font-size: 2.3em;
             font-weight: 500;
             line-height: 1.1;
-            letter-spacing: 0.5px; /* Slight letter spacing */
+            letter-spacing: 0.5px;
             margin-right: 8px;
         }
 
         .finance-card .card-balance-primary .change {
-            font-size: 1em; /* Adjust size as needed */
+            font-size: 1em;
             font-weight: 500;
         }
-        /* Ensure percentage colors work */
         .finance-card .card-balance-primary .change.positive { color: var(--positive-color); }
         .finance-card .card-balance-primary .change.negative { color: var(--negative-color); }
-        .finance-card .card-balance-primary .change.neutral { color: var(--text-secondary-color); } /* Added for consistency */
+        .finance-card .card-balance-primary .change.neutral { color: var(--text-secondary-color); }
 
 
         .finance-card .card-label-primary {
@@ -137,7 +199,7 @@
         .finance-card .card-footer {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end; /* Align items to the bottom */
+            align-items: flex-end;
         }
 
         .finance-card .card-info-secondary {
@@ -154,19 +216,20 @@
         }
 
         .finance-card .card-info-secondary #totalInvestment {
-            font-size: 1.1em; /* Slightly larger than labels */
+            font-size: 1.1em;
             font-weight: 500;
         }
 
-        /* Simple decorative chip */
-        .finance-card .card-chip {
-            width: 38px;
-            height: 28px;
-            background-color: #888; /* Silver/grey color */
-            border-radius: 4px;
-            background: linear-gradient(135deg, #a0a0a0, #707070); /* Subtle gradient for chip */
+        @media (min-width: 600px) {
+            body { font-size: 15px; }
+            .header-main h1 { font-size: 2.8em; }
         }
-        /* --- END: Finance Card Styles --- */
+
+         @media (min-width: 1024px) {
+             body { font-size: 16px; padding: 30px; }
+             .container { max-width: 450px; }
+             .finance-card .card-balance-primary #totalCapitalization { font-size: 2.5em; }
+        }
 
     </style>
 </head>
@@ -183,19 +246,13 @@
              </div>
          </header>
 
-         <!-- START: New Finance Card Section -->
-         <div class="finance-card">
+         <div class="finance-card" id="financeCard">
              <div class="card-header">
-                 <div class="card-logo"></div> <!-- Mastercard-like logo -->
-                 <div class="card-wallet-icon">
-                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28px" height="28px">
-                         <path d="M18 4H6C4.9 4 4 4.9 4 6v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H6V6h12v12zm-7-8H8v2h3v-2zm5 0h-3v2h3v-2z"/> <!-- Simple wallet icon -->
-                     </svg>
-                 </div>
+                 <div class="card-logo"></div>
              </div>
              <div class="card-body">
                  <div class="card-balance-primary">
-                     <span id="totalCapitalization">$0.00</span> <!-- Main figure: Capitalization -->
+                     <span id="totalCapitalization">$0.00</span>
                      <span class="change" id="capitalizationChange"></span>
                  </div>
                  <span class="card-label-primary">Capitalización Actual</span>
@@ -203,12 +260,10 @@
              <div class="card-footer">
                  <div class="card-info-secondary">
                      <span class="label">Inversión Total</span>
-                     <span id="totalInvestment">$0.00</span> <!-- Secondary figure: Investment -->
+                     <span id="totalInvestment">$0.00</span>
                  </div>
-                 <div class="card-chip"></div> <!-- Decorative Chip -->
              </div>
          </div>
-         <!-- END: New Finance Card Section -->
 
          <div class="currency-selector-container">
              <label>Divisa</label>
@@ -276,6 +331,7 @@
             const modalTitle = document.getElementById('modalTitle');
             const modalSubmitBtn = document.getElementById('modalSubmitBtn');
             const editTransactionIdInput = document.getElementById('editTransactionId');
+            const financeCard = document.getElementById('financeCard');
 
             let transactions = [];
             let currentCurrency = 'USD';
@@ -289,11 +345,15 @@
             let editingItemId = null;
             const swipeThreshold = 75;
             const dragStartThreshold = 5;
+            const cardSkins = ['skin-default', 'skin-1', 'skin-2'];
+            let currentSkinIndex = 0;
+            let cardDragStartX = 0;
+            let cardIsDragging = false;
+            const cardSwipeThreshold = 50;
 
             const EXCHANGE_RATE_API_URL = 'https://api.exchangerate-api.com/v4/latest/USD';
-            const CACHE_DURATION_MS = 60 * 60 * 1000; // 1 hour cache
+            const CACHE_DURATION_MS = 60 * 60 * 1000;
 
-            // --- Helper Functions ---
             function formatShares(value) { return Number(value.toFixed(4)); }
             function formatPercentage(value) {
                 if (isNaN(value) || !isFinite(value)) return '';
@@ -304,9 +364,8 @@
                 return (tx.salePrice !== null && !isNaN(tx.salePrice)) ? (tx.salePrice * tx.shares) - (tx.purchasePrice * tx.shares) : 0;
             }
 
-            // --- Exchange Rate Handling ---
             async function fetchExchangeRates() {
-                const lastFetchTime = localStorage.getItem('exchangeRateFetchTime');
+                 const lastFetchTime = localStorage.getItem('exchangeRateFetchTime');
                 const cachedRates = localStorage.getItem('exchangeRates');
 
                 if (cachedRates && lastFetchTime && (Date.now() - parseInt(lastFetchTime)) < CACHE_DURATION_MS) {
@@ -338,18 +397,14 @@
                     }
                 } catch (error) {
                     console.error("Failed to fetch exchange rates:", error);
-                    // Fallback to cached rates if fetch fails but cache exists
                     if (cachedRates) {
                         try {
                             exchangeRates = JSON.parse(cachedRates);
                             console.warn("Using stale cached rates due to fetch error:", exchangeRates);
                             return exchangeRates;
-                        } catch(e) {
-                            console.error("Error parsing stale cached rates:", e);
-                        }
+                        } catch(e) { console.error("Error parsing stale cached rates:", e); }
                     }
-                    // If no cache and fetch fails, use default and alert user
-                    exchangeRates = { USD: 1, GTQ: 7.8 }; // Reset to default
+                    exchangeRates = { USD: 1, GTQ: 7.8 };
                     alert("No se pudieron obtener las tasas de cambio actuales. Usando valores por defecto (1 USD = 7.8 GTQ).");
                     return exchangeRates;
                 }
@@ -360,613 +415,400 @@
                 const rate = exchangeRates[targetCurrency] || 1;
                 return valueInUSD * rate;
             }
-
             function formatCurrency(valueInUSD) {
                 const convertedValue = convertValue(valueInUSD, currentCurrency);
                 const symbol = currentCurrency === 'GTQ' ? 'Q' : '$';
-
                 if (isNaN(convertedValue)) {
                     console.warn("formatCurrency received NaN for valueInUSD:", valueInUSD);
                     return `${symbol}0.00`;
                 }
-
-                const isNegative = valueInUSD < -0.0001; // Use small tolerance for floating point
+                const isNegative = valueInUSD < -0.0001;
                 const absoluteFormattedValue = Math.abs(convertedValue).toFixed(2);
                 return isNegative ? `-${symbol}${absoluteFormattedValue}` : `${symbol}${absoluteFormattedValue}`;
             }
-
              function formatChartAxisValue(valueInUSD) {
                 const convertedValue = convertValue(valueInUSD, currentCurrency);
                 if (isNaN(convertedValue)) return '0';
-                // Show more precision for smaller values
                 return convertedValue.toFixed(Math.abs(convertedValue) >= 10 || Math.abs(convertedValue) < 0.01 ? 0 : 2);
              }
 
-
-            // --- Transaction Data Handling ---
-            function loadTransactions() {
+             function loadTransactions() {
                  const storedTransactions = localStorage.getItem('stockTransactions');
                  if (storedTransactions) {
                      try {
                          transactions = JSON.parse(storedTransactions);
-                         // Ensure data types are correct after parsing
                          transactions.forEach(tx => {
-                             tx.dateTime = new Date(tx.dateTime); // Convert string back to Date object
+                             tx.dateTime = new Date(tx.dateTime);
                              tx.purchasePrice = parseFloat(tx.purchasePrice);
                              tx.shares = parseFloat(tx.shares);
                              tx.salePrice = tx.salePrice !== null && tx.salePrice !== undefined ? parseFloat(tx.salePrice) : null;
-                             // Assign ID if missing (for older data)
                              if (!tx.id) tx.id = tx.dateTime.getTime().toString() + Math.random().toString(16).slice(2);
                          });
-                         transactions.sort((a, b) => a.dateTime - b.dateTime); // Sort by date
+                         transactions.sort((a, b) => a.dateTime - b.dateTime);
                      } catch (e) {
                          console.error("Error parsing transactions from localStorage:", e);
                          transactions = [];
-                         localStorage.removeItem('stockTransactions'); // Clear corrupted data
+                         localStorage.removeItem('stockTransactions');
                      }
-                 } else {
-                     transactions = [];
-                 }
+                 } else { transactions = []; }
              }
-            function saveTransactions() {
-                 transactions.sort((a, b) => a.dateTime - b.dateTime); // Ensure sorted before saving
+             function saveTransactions() {
+                 transactions.sort((a, b) => a.dateTime - b.dateTime);
                  localStorage.setItem('stockTransactions', JSON.stringify(transactions));
-            }
-            function findTransactionById(id) {
-                return transactions.find(tx => tx.id === id);
-            }
-            function deleteTransaction(id) {
-                const index = transactions.findIndex(tx => tx.id === id);
-                if (index > -1) {
-                    transactions.splice(index, 1);
-                    saveTransactions();
-                    updateUI(); // Update display after deletion
-                } else {
-                    console.warn("Tried to delete non-existent transaction ID:", id);
-                }
-            }
+             }
+             function findTransactionById(id) {
+                 return transactions.find(tx => tx.id === id);
+             }
+             function deleteTransaction(id) {
+                 const index = transactions.findIndex(tx => tx.id === id);
+                 if (index > -1) {
+                     transactions.splice(index, 1);
+                     saveTransactions();
+                     updateUI();
+                 } else { console.warn("Tried to delete non-existent transaction ID:", id); }
+             }
 
-            // --- Chart Handling ---
             function initializeChart() {
-                if (stockChart) {
-                    stockChart.destroy(); // Ensure previous chart is destroyed
-                }
-                const ctx = chartCanvas.getContext('2d');
-                const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid-color-val').trim();
-                const tickColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-tick-color-val').trim();
-                const lineBorderColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-line-color-val').trim();
+                 if (stockChart) { stockChart.destroy(); }
+                 const ctx = chartCanvas.getContext('2d');
+                 const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid-color-val').trim();
+                 const tickColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-tick-color-val').trim();
+                 const lineBorderColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-line-color-val').trim();
+                 const gradient = ctx.createLinearGradient(0, 0, 0, 180);
+                 gradient.addColorStop(0, 'rgba(38, 166, 154, 0.55)');
+                 gradient.addColorStop(0.8, 'rgba(38, 166, 154, 0.05)');
+                 gradient.addColorStop(1, 'rgba(38, 166, 154, 0.0)');
 
-                // Gradient for the area fill
-                const gradient = ctx.createLinearGradient(0, 0, 0, 180); // Adjust height as needed
-                gradient.addColorStop(0, 'rgba(38, 166, 154, 0.55)');   // Semi-transparent positive color start
-                gradient.addColorStop(0.8, 'rgba(38, 166, 154, 0.05)'); // Fading out
-                gradient.addColorStop(1, 'rgba(38, 166, 154, 0.0)');    // Fully transparent end
+                 stockChart = new Chart(ctx, {
+                     type: 'line',
+                     data: { labels: [], datasets: [{ label: `Resultado (${currentCurrency})`, data: [], borderColor: lineBorderColor, borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, pointHitRadius: 10, tension: 0.3, fill: true, backgroundColor: gradient }] },
+                     options: {
+                         responsive: true, maintainAspectRatio: false,
+                         scales: {
+                             y: { beginAtZero: false, position: 'right', grid: { color: gridColor, drawBorder: false }, ticks: { color: tickColor, padding: 10, maxTicksLimit: 5, callback: (value) => formatChartAxisValue(value) } },
+                             x: { grid: { display: false, drawBorder: false }, ticks: { color: tickColor, padding: 10, maxRotation: 0, autoSkip: true, maxTicksLimit: 7, callback: function(value) { const date = new Date(this.getLabelForValue(value)); return date.toLocaleTimeString([], { hour: 'numeric', minute:'2-digit', hour12: false }).split(':')[0]; } } }
+                         },
+                         plugins: {
+                             legend: { display: false },
+                             tooltip: { enabled: true, mode: 'index', intersect: false, backgroundColor: 'rgba(0,0,0,0.8)', titleFont: { size: 14 }, bodyFont: { size: 12 }, padding: 10, displayColors: false,
+                                 callbacks: {
+                                     label: (context) => `Resultado: ${formatCurrency(context.parsed.y)}`,
+                                     title: (tooltipItems) => new Date(tooltipItems[0].label).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short'})
+                                 }
+                             }
+                         },
+                         interaction: { mode: 'index', axis: 'x', intersect: false }
+                     }
+                 });
+             }
+             function updateChart() {
+                 if (!stockChart) initializeChart();
+                 if (!stockChart) return;
 
-                stockChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: [], // Populated by updateChart
-                        datasets: [{
-                            label: `Resultado (${currentCurrency})`, // Dynamic label
-                            data: [], // Populated by updateChart
-                            borderColor: lineBorderColor,
-                            borderWidth: 2,
-                            pointRadius: 0, // Hide points by default
-                            pointHoverRadius: 5,
-                            pointHitRadius: 10,
-                            tension: 0.3, // Slightly curved lines
-                            fill: true, // Enable area fill
-                            backgroundColor: gradient // Apply the gradient
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: false, // Allow negative values to scale properly
-                                position: 'right', // Y-axis on the right
-                                grid: {
-                                    color: gridColor,
-                                    drawBorder: false, // Hide the axis border line
-                                },
-                                ticks: {
-                                    color: tickColor,
-                                    padding: 10,
-                                    maxTicksLimit: 5, // Limit number of ticks for clarity
-                                    callback: function(value) {
-                                        // 'value' here is the internal chart value (USD)
-                                        return formatChartAxisValue(value);
-                                    }
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false, // Hide vertical grid lines
-                                    drawBorder: false,
-                                },
-                                ticks: {
-                                    color: tickColor,
-                                    padding: 10,
-                                    maxRotation: 0, // Keep labels horizontal
-                                    autoSkip: true, // Automatically skip labels if too crowded
-                                    maxTicksLimit: 7, // Max number of date labels
-                                    callback: function(value) {
-                                        // 'value' is the index, use getLabelForValue to get the actual label (ISO string)
-                                        const date = new Date(this.getLabelForValue(value));
-                                        // Format date simply (e.g., "10", "2", "2") representing relevant points
-                                        // You might want a more sophisticated formatter (e.g., 'MMM DD', 'HH:mm')
-                                        // depending on the time scale of your transactions
-                                        return date.toLocaleTimeString([], { hour: 'numeric', minute:'2-digit', hour12: true }).split(' ')[0]; // Just the hour like '10' or '2'
-                                    }
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false // Hide the legend box
-                            },
-                            tooltip: {
-                                enabled: true,
-                                mode: 'index', // Show tooltip for all items at that index
-                                intersect: false, // Tooltip appears even when not hovering directly over point
-                                backgroundColor: 'rgba(0,0,0,0.8)',
-                                titleFont: { size: 14 },
-                                bodyFont: { size: 12 },
-                                padding: 10,
-                                displayColors: false, // Hide the color box in tooltip
-                                callbacks: {
-                                    label: function(context) {
-                                        // context.parsed.y holds the data value (USD)
-                                        return `Resultado: ${formatCurrency(context.parsed.y)}`;
-                                    },
-                                    title: function(tooltipItems) {
-                                        // tooltipItems[0].label holds the original label (ISO date string)
-                                        const date = new Date(tooltipItems[0].label);
-                                        return date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short'}); // Format date nicely
-                                    }
-                                }
-                            }
-                        },
-                        interaction: {
-                            mode: 'index', // Interaction applies to the whole vertical index
-                            axis: 'x',
-                            intersect: false // Interaction triggers without direct hover on point
-                        }
-                    }
-                });
+                 let cumulativeResultUSD = 0;
+                 const chartData = transactions.map(tx => {
+                     cumulativeResultUSD += getTransactionResultUSD(tx);
+                     return { x: tx.dateTime.toISOString(), y: cumulativeResultUSD };
+                 });
+                 if (chartData.length === 1) {
+                    const firstTxTime = new Date(transactions[0].dateTime);
+                    const startTime = new Date(firstTxTime.getTime() - 60000);
+                    chartData.unshift({ x: startTime.toISOString(), y: 0 });
+                 } else if (chartData.length === 0) {
+                    const now = new Date(); const startTime = new Date(now.getTime() - 60000);
+                    chartData.push({ x: startTime.toISOString(), y: 0 });
+                 }
+
+                 stockChart.data.labels = chartData.map(d => d.x);
+                 stockChart.data.datasets[0].data = chartData.map(d => d.y);
+                 stockChart.data.datasets[0].label = `Resultado Acumulado (${currentCurrency})`;
+                 stockChart.options.scales.y.ticks.color = getComputedStyle(document.documentElement).getPropertyValue('--chart-tick-color-val').trim();
+                 stockChart.options.scales.y.grid.color = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid-color-val').trim();
+                 stockChart.options.scales.x.ticks.color = getComputedStyle(document.documentElement).getPropertyValue('--chart-tick-color-val').trim();
+                 stockChart.data.datasets[0].borderColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-line-color-val').trim();
+                 stockChart.options.scales.y.ticks.callback = (value) => formatChartAxisValue(value);
+                 stockChart.options.plugins.tooltip.callbacks.label = (context) => `Resultado: ${formatCurrency(context.parsed.y)}`;
+                 stockChart.update();
             }
 
-            function updateChart() {
-                if (!stockChart) initializeChart(); // Ensure chart exists
-                if (!stockChart) return; // Still no chart? Bail out.
-
-                // Calculate cumulative results for the chart
-                let cumulativeResultUSD = 0;
-                const chartData = transactions.map(tx => {
-                    cumulativeResultUSD += getTransactionResultUSD(tx);
-                    return {
-                        x: tx.dateTime.toISOString(), // Use ISO string for labels/parsing
-                        y: cumulativeResultUSD          // Use cumulative result for Y value
-                    };
-                });
-
-                // If there's only one transaction, add a dummy starting point at 0
-                if (chartData.length === 1) {
-                   const firstTxTime = new Date(transactions[0].dateTime);
-                   const startTime = new Date(firstTxTime.getTime() - 60000); // 1 minute before first tx
-                   chartData.unshift({ x: startTime.toISOString(), y: 0 });
-                } else if (chartData.length === 0) {
-                   // Add a dummy point at 0 if no data to show an empty chart baseline
-                   const now = new Date();
-                   const startTime = new Date(now.getTime() - 60000);
-                   chartData.push({ x: startTime.toISOString(), y: 0 });
-                }
-
-
-                stockChart.data.labels = chartData.map(d => d.x);
-                stockChart.data.datasets[0].data = chartData.map(d => d.y);
-                stockChart.data.datasets[0].label = `Resultado Acumulado (${currentCurrency})`; // Update label with currency
-
-                // Update dynamic options based on currency/theme if needed
-                stockChart.options.scales.y.ticks.color = getComputedStyle(document.documentElement).getPropertyValue('--chart-tick-color-val').trim();
-                stockChart.options.scales.y.grid.color = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid-color-val').trim();
-                stockChart.options.scales.x.ticks.color = getComputedStyle(document.documentElement).getPropertyValue('--chart-tick-color-val').trim();
-                stockChart.data.datasets[0].borderColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-line-color-val').trim();
-
-                // Re-assign callback to ensure it uses the latest currentCurrency
-                stockChart.options.scales.y.ticks.callback = function(value) {
-                    return formatChartAxisValue(value);
-                };
-                stockChart.options.plugins.tooltip.callbacks.label = function(context) {
-                    return `Resultado: ${formatCurrency(context.parsed.y)}`;
-                };
-
-
-                stockChart.update(); // Refresh the chart
-            }
-
-
-            // --- Swipe Handling ---
-            function handleDragStart(event) {
-                if (event.type === 'mousedown' && event.button !== 0) return; // Only left clicks
-
+             function handleDragStart(event) {
+                if (event.type === 'mousedown' && event.button !== 0) return;
                 const targetItem = event.target.closest('.transaction-item');
-                if (!targetItem) return; // Didn't click on a draggable item
-
+                if (!targetItem) return;
                 draggedItemElement = targetItem;
                 draggedItemWrapper = targetItem.closest('.transaction-item-wrapper');
-                if (!draggedItemWrapper) return; // Should always have a wrapper
-
+                if (!draggedItemWrapper) return;
                 dragStartX = event.touches ? event.touches[0].clientX : event.clientX;
-                currentDragX = dragStartX; // Initialize current position
-                isDragging = false; // Not dragging yet, need to pass threshold
-
-                // Prevent text selection during drag
+                currentDragX = dragStartX;
+                isDragging = false;
                 document.body.style.userSelect = 'none';
              }
-
-            function handleDragMove(event) {
+             function handleDragMove(event) {
                 if (!draggedItemElement) return;
-
-                // Prevent vertical scroll while swiping horizontally
-                if (event.touches && event.cancelable) {
-                    event.preventDefault();
-                }
-
+                if (event.touches && event.cancelable) { event.preventDefault(); }
                 currentDragX = event.touches ? event.touches[0].clientX : event.clientX;
                 const diffX = currentDragX - dragStartX;
-
-                // Only start visual drag after exceeding threshold
                 if (!isDragging && Math.abs(diffX) > dragStartThreshold) {
                     isDragging = true;
                     draggedItemElement.classList.add('dragging');
-                    draggedItemElement.style.transition = 'none'; // Disable transition during drag for smoothness
+                    draggedItemElement.style.transition = 'none';
                 }
-
                 if (isDragging) {
                     draggedItemElement.style.transform = `translateX(${diffX}px)`;
-
-                    // Update background visibility and content
                     const background = draggedItemWrapper.querySelector('.transaction-item-swipe-background');
                     if (background) {
-                        const swipeRatio = Math.min(1, Math.abs(diffX) / (swipeThreshold * 1.5)); // Make it fully visible a bit after threshold
+                        const swipeRatio = Math.min(1, Math.abs(diffX) / (swipeThreshold * 1.5));
                         background.style.opacity = swipeRatio;
-
-                        if (diffX > dragStartThreshold) { // Swiping right (Edit)
-                            background.className = 'transaction-item-swipe-background swipe-edit';
-                            background.innerHTML = `<span>EDITAR</span><span></span>`;
-                        } else if (diffX < -dragStartThreshold) { // Swiping left (Delete)
-                            background.className = 'transaction-item-swipe-background swipe-delete';
-                            background.innerHTML = `<span></span><span>ELIMINAR</span>`;
-                        } else {
-                            background.style.opacity = 0; // Hide if back near center
-                        }
+                        if (diffX > dragStartThreshold) { background.className = 'transaction-item-swipe-background swipe-edit'; background.innerHTML = `<span>EDITAR</span><span></span>`; }
+                        else if (diffX < -dragStartThreshold) { background.className = 'transaction-item-swipe-background swipe-delete'; background.innerHTML = `<span></span><span>ELIMINAR</span>`; }
+                        else { background.style.opacity = 0; }
                     }
                 }
              }
-
-            function handleDragEnd(event) {
-                if (!isDragging) { // If drag didn't actually start (didn't pass threshold)
-                    resetDragState();
-                    return;
-                }
-
+             function handleDragEnd(event) {
+                if (!isDragging) { resetDragState(); return; }
                 const diffX = currentDragX - dragStartX;
-                const transactionId = draggedItemWrapper.dataset.id;
-
+                const transactionId = draggedItemWrapper?.dataset?.id;
                 if (!transactionId) {
                     console.error("Missing transaction ID on dragged item wrapper.");
-                    snapBack(draggedItemElement); // Snap back if ID is missing
-                    resetDragState();
-                    return;
+                    if (draggedItemElement) snapBack(draggedItemElement);
+                    resetDragState(); return;
                 }
+                 if (draggedItemElement) { draggedItemElement.style.transition = 'transform 0.1s ease-out'; }
 
-                // Re-enable transition for snap/slide effects
-                 if (draggedItemElement) {
-                    draggedItemElement.style.transition = 'transform 0.1s ease-out';
-                 }
-
-
-                if (diffX > swipeThreshold) { // Swiped right enough for Edit
-                    console.log("Edit action triggered for ID:", transactionId);
-                    editingItemId = transactionId; // Track which item is being edited
+                if (diffX > swipeThreshold) {
+                    editingItemId = transactionId;
                     openEditModal(transactionId);
-                    // Don't snap back immediately, modal opens, snap handled in closeModal or if edit cancelled
-                } else if (diffX < -swipeThreshold) { // Swiped left enough for Delete
-                    console.log("Delete action triggered for ID:", transactionId);
-                    // Use custom confirmation if available, otherwise browser default
+                } else if (diffX < -swipeThreshold) {
                     if (confirm(`¿Seguro que quieres eliminar esta transacción (${findTransactionById(transactionId)?.ticker || 'N/A'})?`)) {
-                        // Animate out before deleting data
                         if (draggedItemWrapper) {
-                            draggedItemWrapper.style.transition = 'height 0.2s ease-out, opacity 0.2s ease-out, margin 0.2s ease-out';
+                            draggedItemWrapper.style.transition = 'height 0.2s ease-out, opacity 0.2s ease-out, margin 0.2s ease-out, padding 0.2s ease-out';
                             draggedItemWrapper.style.height = '0px';
                             draggedItemWrapper.style.opacity = '0';
-                            draggedItemWrapper.style.marginBottom = '0px'; // Collapse margin too
-                            draggedItemWrapper.style.paddingTop = '0px';
-                            draggedItemWrapper.style.paddingBottom = '0px';
-
-
-                            // Wait for animation to finish before removing from DOM/data
-                            setTimeout(() => {
-                                deleteTransaction(transactionId);
-                                // updateUI() is called within deleteTransaction
-                            }, 200); // Match timeout to CSS transition duration
-                        } else {
-                            deleteTransaction(transactionId); // Fallback if wrapper somehow lost
-                        }
-                    } else {
-                        snapBack(draggedItemElement); // Snap back if deletion cancelled
-                    }
-                } else {
-                    // Didn't swipe far enough, snap back
-                    snapBack(draggedItemElement);
-                }
-
+                            draggedItemWrapper.style.margin = '0';
+                            draggedItemWrapper.style.padding = '0';
+                            setTimeout(() => { deleteTransaction(transactionId); }, 200);
+                        } else { deleteTransaction(transactionId); }
+                    } else { if (draggedItemElement) snapBack(draggedItemElement); }
+                } else { if (draggedItemElement) snapBack(draggedItemElement); }
                 resetDragState();
             }
-
              function resetDragState() {
                  if (draggedItemElement) {
                      draggedItemElement.classList.remove('dragging');
-                     // Ensure transition is reset if it wasn't already during snapBack/animation
                      draggedItemElement.style.transition = 'transform 0.1s ease-out';
                  }
                  isDragging = false;
                  draggedItemElement = null;
-                 // Keep draggedItemWrapper temporarily if edit modal is open, otherwise clear
-                 if (!editingItemId) {
-                     draggedItemWrapper = null;
-                 }
-                 dragStartX = 0;
-                 currentDragX = 0;
-                 document.body.style.userSelect = ''; // Re-enable text selection
+                 if (!editingItemId) { draggedItemWrapper = null; }
+                 dragStartX = 0; currentDragX = 0;
+                 document.body.style.userSelect = '';
              }
-
              function snapBack(item) {
                  if (!item) return;
                  item.style.transform = 'translateX(0px)';
                  const wrapper = item.closest('.transaction-item-wrapper');
                  if (wrapper) {
                      const background = wrapper.querySelector('.transaction-item-swipe-background');
-                     if (background) {
-                         // Fade out the background quickly
-                         background.style.transition = 'opacity 0.1s ease-out';
-                         background.style.opacity = 0;
-                     }
+                     if (background) { background.style.transition = 'opacity 0.1s ease-out'; background.style.opacity = 0; }
                  }
              }
-
              function attachSwipeListeners(wrapperElement) {
-                 // Use passive: true where possible, but move needs false to allow preventDefault
                  wrapperElement.addEventListener('touchstart', handleDragStart, { passive: true });
-                 wrapperElement.addEventListener('touchmove', handleDragMove, { passive: false }); // Need false to prevent scroll
+                 wrapperElement.addEventListener('touchmove', handleDragMove, { passive: false });
                  wrapperElement.addEventListener('touchend', handleDragEnd);
-                 wrapperElement.addEventListener('touchcancel', handleDragEnd); // Handle cancelled touches
-
-                 // Mouse events for desktop
+                 wrapperElement.addEventListener('touchcancel', handleDragEnd);
                  wrapperElement.addEventListener('mousedown', handleDragStart);
-                 // Add mousemove/mouseup listeners to the document to capture drags
-                 // that move off the original element. These are added here but managed
-                 // in the handlers themselves (only active while dragging).
              }
-             // Add global listeners for mouseup/mousemove to handle dragging ending anywhere
-             document.addEventListener('mousemove', (e) => {
-                 // Only call handler if dragging actually started
-                 if(isDragging) { handleDragMove(e); }
-             });
-             document.addEventListener('mouseup', (e) => {
-                 // Only call handler if dragging actually started
-                 if(isDragging) { handleDragEnd(e); }
-             });
+             document.addEventListener('mousemove', (e) => { if(isDragging) { handleDragMove(e); } });
+             document.addEventListener('mouseup', (e) => { if(isDragging) { handleDragEnd(e); } });
 
-
-            // --- Modal Handling ---
              function openAddModal() {
                  modalTitle.textContent = "Añadir Nueva Transacción";
                  modalSubmitBtn.textContent = "Añadir";
-                 addTransactionForm.reset(); // Clear previous input
-                 editTransactionIdInput.value = ''; // Ensure no edit ID is set
-                 editingItemId = null; // Clear editing state
-
-                 // Pre-fill date/time to current time
+                 addTransactionForm.reset();
+                 editTransactionIdInput.value = '';
+                 editingItemId = null;
                  const now = new Date();
-                 now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // Adjust for local timezone
+                 now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
                  document.getElementById('transactionDateTime').value = now.toISOString().slice(0, 16);
-
-                 modal.style.display = 'flex'; // Show modal
-                 document.getElementById('ticker').focus(); // Focus first field
+                 modal.style.display = 'flex';
+                 document.getElementById('ticker').focus();
              }
-
              function openEditModal(transactionId) {
                  const tx = findTransactionById(transactionId);
                  if (!tx) {
                     console.error("Cannot open edit modal: Transaction not found for ID", transactionId);
-                    snapBack(draggedItemElement); // Snap back the item if tx data is missing
-                    resetDragState();
-                    return;
+                    if (draggedItemElement) snapBack(draggedItemElement);
+                    resetDragState(); return;
                  }
-
                  modalTitle.textContent = "Editar Transacción";
                  modalSubmitBtn.textContent = "Actualizar";
-                 addTransactionForm.reset(); // Clear previous input first
-                 editTransactionIdInput.value = tx.id; // Set the hidden ID field
-                 editingItemId = tx.id; // Keep track of the item being edited
-
-                 // Populate form fields with existing transaction data
+                 addTransactionForm.reset();
+                 editTransactionIdInput.value = tx.id;
+                 editingItemId = tx.id;
                  document.getElementById('ticker').value = tx.ticker;
                  document.getElementById('assetType').value = tx.assetType;
                  document.getElementById('purchasePrice').value = tx.purchasePrice;
                  document.getElementById('shares').value = tx.shares;
-                 document.getElementById('salePrice').value = tx.salePrice ?? ''; // Use nullish coalescing for optional field
-
-                 // Format date correctly for datetime-local input
-                 const localDateTime = new Date(tx.dateTime.getTime() - (tx.dateTime.getTimezoneOffset() * 60000))
-                     .toISOString().slice(0, 16);
+                 document.getElementById('salePrice').value = tx.salePrice ?? '';
+                 const localDateTime = new Date(tx.dateTime.getTime() - (tx.dateTime.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
                  document.getElementById('transactionDateTime').value = localDateTime;
-
-                 modal.style.display = 'flex'; // Show modal
-                 document.getElementById('ticker').focus(); // Focus first field
+                 modal.style.display = 'flex';
+                 document.getElementById('ticker').focus();
              }
-
              function closeModal() {
                  modal.style.display = 'none';
-                 // If an item was being edited, snap it back now that the modal is closed
                  if (editingItemId) {
                      const wrapperToSnap = transactionListContainer.querySelector(`.transaction-item-wrapper[data-id="${editingItemId}"]`);
                      if (wrapperToSnap) {
                          const itemToSnap = wrapperToSnap.querySelector('.transaction-item');
-                         if (itemToSnap) {
-                             snapBack(itemToSnap);
-                         }
+                         if (itemToSnap) { snapBack(itemToSnap); }
                      }
                  }
-                 editingItemId = null; // Clear editing state
-                 draggedItemWrapper = null; // Clear reference to wrapper
+                 editingItemId = null;
+                 draggedItemWrapper = null;
              }
 
+             function applyCardSkin(index) {
+                 financeCard.classList.remove(...cardSkins);
+                 financeCard.classList.add(cardSkins[index]);
+                 currentSkinIndex = index;
+                 localStorage.setItem('selectedCardSkinIndex', index);
+             }
 
-            // --- UI Update Function ---
+             function handleCardDragStart(event) {
+                 if (event.target.closest('button, a, input, select')) return;
+                 if (event.type === 'mousedown' && event.button !== 0) return;
+                 cardDragStartX = event.touches ? event.touches[0].clientX : event.clientX;
+                 cardIsDragging = true;
+                 financeCard.style.cursor = 'grabbing';
+             }
+
+             function handleCardDragEnd(event) {
+                 if (!cardIsDragging) return;
+                 cardIsDragging = false;
+                 financeCard.style.cursor = 'grab';
+
+                 const cardDragEndX = event.changedTouches ? event.changedTouches[0].clientX : event.clientX;
+                 const diffX = cardDragEndX - cardDragStartX;
+
+                 if (Math.abs(diffX) > cardSwipeThreshold) {
+                     if (diffX > 0) {
+                         const newIndex = (currentSkinIndex - 1 + cardSkins.length) % cardSkins.length;
+                         applyCardSkin(newIndex);
+                     } else {
+                         const newIndex = (currentSkinIndex + 1) % cardSkins.length;
+                         applyCardSkin(newIndex);
+                     }
+                 }
+                 cardDragStartX = 0;
+             }
+
             function updateUI() {
-                // Clear current list
                 transactionListContainer.innerHTML = '';
-
-                // Calculate Totals & Percentage
                 let totalInvestmentUSD = 0;
-                let totalCapitalizationUSD = 0; // Based on sale price if sold, otherwise purchase price? * Needs clarification *
-                                               // Current logic uses ONLY sale price for capitalization
+                let totalCapitalizationUSD = 0;
+                let costOfSoldItemsUSD = 0;
+                let revenueFromSoldItemsUSD = 0;
 
                 transactions.forEach(tx => {
                     totalInvestmentUSD += (tx.purchasePrice * tx.shares);
-                    // Capitalization = value of sold items
                     if (tx.salePrice !== null && !isNaN(tx.salePrice)) {
                         totalCapitalizationUSD += (tx.salePrice * tx.shares);
-                    }
-                    // If you want capitalization to reflect current value of UNSOLD items,
-                    // you'd need a way to fetch current prices. For now, it's based on completed sales.
-                });
-
-                // Display Totals
-                totalInvestmentEl.textContent = formatCurrency(totalInvestmentUSD);
-                totalCapitalizationEl.textContent = formatCurrency(totalCapitalizationUSD);
-
-                // Calculate and Display Percentage Change (Profit/Loss on Sold Items vs. Total Investment)
-                let profitLossUSD = totalCapitalizationUSD - totalInvestmentUSD; // This is potentially misleading if items are unsold
-                                                                                  // A better metric might be P/L only on SOLD items vs their cost.
-                                                                                  // Let's recalculate based *only* on sold items
-                let costOfSoldItemsUSD = 0;
-                let revenueFromSoldItemsUSD = 0;
-                transactions.forEach(tx => {
-                    if (tx.salePrice !== null && !isNaN(tx.salePrice)) {
                         costOfSoldItemsUSD += (tx.purchasePrice * tx.shares);
                         revenueFromSoldItemsUSD += (tx.salePrice * tx.shares);
                     }
                 });
 
+                totalInvestmentEl.textContent = formatCurrency(totalInvestmentUSD);
+                totalCapitalizationEl.textContent = formatCurrency(totalCapitalizationUSD);
+
                 let profitLossOnSoldUSD = revenueFromSoldItemsUSD - costOfSoldItemsUSD;
                 let percentageChange = costOfSoldItemsUSD !== 0 ? (profitLossOnSoldUSD / costOfSoldItemsUSD) * 100 : 0;
 
-
-                // Display Percentage Change
                 capitalizationChangeEl.textContent = formatPercentage(percentageChange);
-                capitalizationChangeEl.className = 'change'; // Reset classes
-                if (percentageChange > 0.01) { // Use a small threshold for floating point
-                    capitalizationChangeEl.classList.add('positive');
-                } else if (percentageChange < -0.01) {
-                    capitalizationChangeEl.classList.add('negative');
-                } else {
-                     capitalizationChangeEl.classList.add('neutral');
-                }
+                capitalizationChangeEl.className = 'change';
+                if (percentageChange > 0.01) capitalizationChangeEl.classList.add('positive');
+                else if (percentageChange < -0.01) capitalizationChangeEl.classList.add('negative');
+                else capitalizationChangeEl.classList.add('neutral');
 
-                // Display Transactions List (Most Recent First)
-                const displayTransactions = [...transactions].reverse(); // Create reversed copy for display
+                const displayTransactions = [...transactions].reverse();
+                const limitedTransactions = displayTransactions.slice(0, 5);
 
                 if (transactions.length === 0) {
                     transactionListContainer.innerHTML = '<p class="no-transactions">Añade tu primera transacción o desliza para editar/eliminar.</p>';
                 } else {
-                    displayTransactions.forEach(tx => {
-                        const resultUSD = getTransactionResultUSD(tx); // P/L for this specific transaction if sold
+                    limitedTransactions.forEach(tx => {
+                        const resultUSD = getTransactionResultUSD(tx);
                         let resultClass = 'neutral';
                         if (resultUSD > 0.001) resultClass = 'positive';
                         else if (resultUSD < -0.001) resultClass = 'negative';
 
                         const wrapper = document.createElement('div');
                         wrapper.classList.add('transaction-item-wrapper');
-                        wrapper.dataset.id = tx.id; // Add ID for swipe actions
+                        wrapper.dataset.id = tx.id;
 
-                        // Background for swipe actions (initially hidden)
                         const swipeBg = document.createElement('div');
                         swipeBg.className = 'transaction-item-swipe-background';
                         swipeBg.style.opacity = 0;
                         wrapper.appendChild(swipeBg);
 
-                        // Visible transaction item content
                         const item = document.createElement('div');
                         item.classList.add('transaction-item');
-                        // Display Ticker, Result (if sold), Shares label, Shares value
+
+                        const hasSalePrice = tx.salePrice !== null && !isNaN(tx.salePrice);
+                        const resultText = hasSalePrice ? formatCurrency(resultUSD) : '';
+
                         item.innerHTML = `
                             <span>${tx.ticker.toUpperCase()}</span>
-                            <span class="result ${resultClass}">${tx.salePrice !== null ? formatCurrency(resultUSD) : ''}</span>
-                            <span style="color: var(--text-secondary-color); font-size: 0.85em;">${tx.assetType || 'Activo'}</span>
+                            <span class="result ${resultClass}">${resultText}</span>
+                            <span>${tx.assetType || 'Activo'}</span>
                             <span>${formatShares(tx.shares)}</span>
                         `;
-                        // Adjust grid template based on whether result is shown
-                        if (tx.salePrice !== null) {
-                             item.style.gridTemplateColumns = "auto 1fr auto auto";
-                        } else {
-                             item.style.gridTemplateColumns = "auto 1fr auto"; // Adjust if no result shown
-                             item.children[1].textContent = ''; // Clear the result span visually
-                             item.children[1].style.display = 'none'; // Hide result span
-                             item.children[2].style.textAlign = 'right'; // Align asset type right
-                             item.children[3].style.textAlign = 'right'; // Align shares right
-                        }
 
+                        if (!hasSalePrice) {
+                           item.classList.add('no-result');
+                           item.children[1].style.display = 'none';
+                           item.children[2].style.textAlign = 'right';
+                        } else {
+                           item.children[2].style.textAlign = 'left';
+                        }
 
                         wrapper.appendChild(item);
                         transactionListContainer.appendChild(wrapper);
-
-                        // Attach swipe listeners to the wrapper AFTER it's in the DOM
                         attachSwipeListeners(wrapper);
                     });
+                    if (transactions.length > 5) {
+                         const moreMsg = document.createElement('p');
+                         moreMsg.textContent = `Mostrando las últimas 5 de ${transactions.length} transacciones.`;
+                         moreMsg.style.textAlign = 'center';
+                         moreMsg.style.fontSize = '0.8em';
+                         moreMsg.style.color = 'var(--text-secondary-color)';
+                         moreMsg.style.marginTop = '10px';
+                         transactionListContainer.appendChild(moreMsg);
+                    }
                 }
-
-                // Update Chart
                 updateChart();
             }
 
-
-            // --- Event Listeners ---
             addTransactionBtn.addEventListener('click', openAddModal);
-
             removeTransactionBtn.addEventListener('click', () => {
-                if (transactions.length === 0) {
-                    alert("No hay transacciones para eliminar.");
-                    return;
-                }
+                if (transactions.length === 0) { alert("No hay transacciones para eliminar."); return; }
                 if (confirm("¿Seguro que quieres eliminar TODAS las transacciones? Esta acción no se puede deshacer.")) {
                     transactions = [];
                     saveTransactions();
                     updateUI();
                 }
             });
-
             closeModalBtn.addEventListener('click', closeModal);
             cancelModalBtn.addEventListener('click', closeModal);
-
-            // Close modal if clicking outside the content area
-            window.addEventListener('click', (event) => {
-                if (event.target === modal) {
-                    closeModal();
-                }
-            });
+            window.addEventListener('click', (event) => { if (event.target === modal) { closeModal(); } });
 
             addTransactionForm.addEventListener('submit', (event) => {
-                event.preventDefault(); // Prevent default form submission
-
+                event.preventDefault();
                 const formData = new FormData(event.target);
                 const editId = formData.get('editTransactionId');
-
-                // Basic validation
                 const ticker = formData.get('ticker')?.trim().toUpperCase();
                 const assetType = formData.get('assetType')?.trim();
                 const purchasePriceStr = formData.get('purchasePrice');
@@ -975,77 +817,64 @@
                 const dateTimeStr = formData.get('transactionDateTime');
 
                 if (!ticker || !assetType || !purchasePriceStr || !sharesStr || !dateTimeStr) {
-                     alert("Por favor, rellena todos los campos obligatorios (Ticker, Tipo, Precio Compra, Acciones, Fecha).");
-                     return;
+                     alert("Por favor, rellena todos los campos obligatorios (Ticker, Tipo, Precio Compra, Acciones, Fecha)."); return;
                 }
-
 
                 const transactionData = {
-                    ticker: ticker,
-                    assetType: assetType,
-                    purchasePrice: parseFloat(purchasePriceStr),
-                    shares: parseFloat(sharesStr),
-                    // Handle optional sale price: convert to number if present, else null
+                    ticker: ticker, assetType: assetType,
+                    purchasePrice: parseFloat(purchasePriceStr), shares: parseFloat(sharesStr),
                     salePrice: (salePriceStr && !isNaN(parseFloat(salePriceStr))) ? parseFloat(salePriceStr) : null,
-                    dateTime: new Date(dateTimeStr) // Parse date string
+                    dateTime: new Date(dateTimeStr)
                 };
 
-                // More robust validation for numbers and date
                 if (isNaN(transactionData.purchasePrice) || transactionData.purchasePrice < 0 ||
-                    isNaN(transactionData.shares) || transactionData.shares <= 0 || // Shares should be > 0
+                    isNaN(transactionData.shares) || transactionData.shares <= 0 ||
                     (transactionData.salePrice !== null && (isNaN(transactionData.salePrice) || transactionData.salePrice < 0)) ||
-                    isNaN(transactionData.dateTime.getTime())) { // Check if date is valid
-                    alert("Por favor, introduce valores numéricos válidos y una fecha correcta.");
-                    return;
+                    isNaN(transactionData.dateTime.getTime())) {
+                    alert("Por favor, introduce valores numéricos válidos y una fecha correcta."); return;
                 }
-
 
                 if (editId) {
-                    // Editing existing transaction
                     const index = transactions.findIndex(tx => tx.id === editId);
-                    if (index > -1) {
-                        // Preserve the original ID when updating
-                        transactions[index] = { ...transactions[index], ...transactionData };
-                        console.log("Transaction updated:", transactions[index]);
-                    } else {
-                        console.error("Transaction ID not found for editing:", editId);
-                        alert("Error: No se pudo encontrar la transacción para actualizar.");
-                        closeModal(); // Close modal even on error
-                        return;
-                    }
+                    if (index > -1) { transactions[index] = { ...transactions[index], ...transactionData }; }
+                    else { console.error("Transaction ID not found for editing:", editId); alert("Error: No se pudo encontrar la transacción para actualizar."); closeModal(); return; }
                 } else {
-                    // Adding new transaction
-                    transactionData.id = Date.now().toString() + Math.random().toString(16).slice(2); // Generate unique ID
+                    transactionData.id = Date.now().toString() + Math.random().toString(16).slice(2);
                     transactions.push(transactionData);
-                    console.log("Transaction added:", transactionData);
                 }
-
-                saveTransactions();
-                updateUI();
-                closeModal();
+                saveTransactions(); updateUI(); closeModal();
             });
 
             currencySelector.addEventListener('change', async (event) => {
                 currentCurrency = event.target.value;
                 localStorage.setItem('selectedCurrency', currentCurrency);
-                await fetchExchangeRates(); // Re-fetch or use cache
-                updateUI(); // Update display with new currency
+                await fetchExchangeRates();
+                updateUI();
             });
 
-            // --- Initialization ---
+            financeCard.addEventListener('touchstart', handleCardDragStart, { passive: true });
+            financeCard.addEventListener('touchend', handleCardDragEnd);
+            financeCard.addEventListener('touchcancel', handleCardDragEnd);
+            financeCard.addEventListener('mousedown', handleCardDragStart);
+            document.addEventListener('mouseup', (e) => { if(cardIsDragging) { handleCardDragEnd(e); } });
+
             async function initializeApp() {
                 currentCurrency = localStorage.getItem('selectedCurrency') || 'USD';
                 currencySelector.value = currentCurrency;
 
-                loadTransactions(); // Load data first
-                initializeChart(); // Setup chart structure
-                await fetchExchangeRates(); // Get rates needed for display
-                updateUI(); // Populate UI and chart with data and correct currency
+                const savedSkinIndex = parseInt(localStorage.getItem('selectedCardSkinIndex') || '0');
+                currentSkinIndex = (savedSkinIndex >= 0 && savedSkinIndex < cardSkins.length) ? savedSkinIndex : 0;
+                applyCardSkin(currentSkinIndex);
+
+                loadTransactions();
+                initializeChart();
+                await fetchExchangeRates();
+                updateUI();
             }
 
             initializeApp();
 
-        }); // End DOMContentLoaded
+        });
     </script>
 </body>
 </html>
