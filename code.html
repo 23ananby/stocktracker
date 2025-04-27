@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Market Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-secondary-color: #a0a0a0;
+            --positive-color: #26a69a;
+            --negative-color: #ef5350;
+            --neutral-color: var(--text-secondary-color);
+            --border-color: #444;
+            --button-bg: #333;
+            --button-hover-bg: #444;
+            --chart-grid-color-val: rgba(255, 255, 255, 0.1);
+            --chart-line-color-val: #26a69a;
+            --chart-tick-color-val: #a0a0a0;
+            --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            --modal-bg: rgba(0, 0, 0, 0.7);
+            --modal-content-bg: #2a2a2a;
+            --swipe-delete-bg: var(--negative-color);
+            --swipe-edit-bg: var(--positive-color);
+            --link-color: #42a5f5;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: var(--font-family); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 20px; font-size: 14px; }
+        .container { background-color: #2a2a2a; border-radius: 8px; padding: 20px; max-width: 400px; width: 100%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); overflow: hidden; }
+        header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .header-main { flex-grow: 1; } .header-main h1 { font-size: 2.5em; font-weight: bold; line-height: 1; margin-bottom: 2px; } .header-main p { color: var(--text-secondary-color); font-size: 0.9em; }
+        .header-actions { display: flex; align-items: center; flex-shrink: 0; }
+        .header-actions button { background-color: var(--button-bg); color: var(--text-color); border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; font-size: 0.85em; margin-left: 8px; transition: background-color 0.2s ease; white-space: nowrap; } .header-actions button:hover { background-color: var(--button-hover-bg); }
+        .price-info { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: flex-start; }
+        .price-block { flex: 1; padding-right: 5px; } .price-block:last-child { padding-right: 0; text-align: right; display: flex; flex-direction: column; align-items: flex-end; } .price-block .value-line { display: flex; align-items: baseline; justify-content: flex-start; min-height: 1.2em; } .price-block:last-child .value-line { justify-content: flex-end; } .price-block .price { font-size: 1.8em; font-weight: 500; line-height: 1; margin-right: 5px; } .price-block .change { font-size: 1.1em; font-weight: 500; line-height: 1; } .price-block .change.positive { color: var(--positive-color); } .price-block .change.negative { color: var(--negative-color); } .price-block .label { display: block; color: var(--text-secondary-color); font-size: 0.9em; margin-top: 4px; }
+        .currency-selector-container { color: var(--text-secondary-color); font-size: 0.9em; margin-bottom: 20px; display: flex; align-items: center; } .currency-selector-container label { margin-right: 5px; }
+        #currencySelector { background-color: var(--button-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 4px; padding: 2px 5px; font-size: 1em; cursor: pointer; -webkit-appearance: none; -moz-appearance: none; appearance: none; } #currencySelector:focus { outline: none; box-shadow: none; }
+        .chart-area { height: 200px; margin-bottom: 25px; position: relative; }
+        .transaction-list { margin-bottom: 20px; min-height: 80px; }
+        .transaction-item-wrapper { position: relative; overflow: hidden; background-color: var(--modal-content-bg); user-select: none; touch-action: pan-y; border-bottom: 1px solid var(--border-color); } .transaction-item-wrapper:last-child { border-bottom: none;}
+        .transaction-item-swipe-background { position: absolute; top: 0; bottom: 0; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: white; font-weight: bold; opacity: 0; transition: opacity 0.1s ease-out; } .swipe-delete { background-color: var(--swipe-delete-bg); justify-content: flex-end; } .swipe-edit { background-color: var(--swipe-edit-bg); justify-content: flex-start; }
+        .transaction-item { display: grid; grid-template-columns: auto 1fr auto auto; gap: 10px; padding: 12px 10px; align-items: center; font-size: 0.95em; background-color: var(--modal-content-bg); position: relative; transition: transform 0.1s ease-out; cursor: grab; } .transaction-item.dragging { cursor: grabbing; transition: none; } .transaction-item span:nth-child(1) { font-weight: 600; } .transaction-item span:nth-child(2) { text-align: right; font-weight: 600; } .transaction-item span.result.positive { color: var(--positive-color); } .transaction-item span.result.negative { color: var(--negative-color); } .transaction-item span.result.neutral { color: var(--neutral-color); } .transaction-item span:nth-child(3) { color: var(--text-secondary-color); font-size: 0.85em; text-align: right; } .transaction-item span:nth-child(4) { text-align: right; font-weight: 500; min-width: 50px; } .no-transactions { color: var(--text-secondary-color); text-align: center; padding: 20px 0; font-style: italic; }
+        footer p { color: var(--link-color); font-size: 0.9em; display: block; text-align: left; margin-top: 10px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: var(--modal-bg); align-items: center; justify-content: center; } .modal-content { background-color: var(--modal-content-bg); margin: auto; padding: 25px; border: 1px solid var(--border-color); width: 80%; max-width: 450px; border-radius: 8px; color: var(--text-color); box-shadow: 0 5px 15px rgba(0,0,0,0.5); } .modal-content h2 { margin-top: 0; margin-bottom: 20px; font-weight: 500; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; } .modal-content label { display: block; margin-bottom: 5px; font-size: 0.9em; color: var(--text-secondary-color); } .modal-content input[type="text"], .modal-content input[type="number"], .modal-content input[type="datetime-local"], .modal-content select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--button-bg); color: var(--text-color); font-size: 1em; } .modal-content input[type="number"]::-webkit-inner-spin-button, .modal-content input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; } .modal-content input[type="number"] { -moz-appearance: textfield; } .modal-actions { text-align: right; margin-top: 20px; } .modal-actions button { background-color: var(--button-bg); color: var(--text-color); border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; font-size: 0.9em; margin-left: 10px; transition: background-color 0.2s ease; } .modal-actions button.primary { background-color: var(--positive-color); color: #fff; } .modal-actions button.primary:hover { background-color: #1e8e84; } .modal-actions button:hover { background-color: var(--button-hover-bg); } .close-button { color: var(--text-secondary-color); float: right; font-size: 24px; font-weight: bold; line-height: 1; cursor: pointer; margin-top: -10px; } .close-button:hover, .close-button:focus { color: var(--text-color); text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+         <header> <div class="header-main"> <h1>Billetera</h1> <p>Stock Market Tracker</p> </div> <div class="header-actions"> <button id="removeTransactionBtn">Remover</button> <button id="addTransactionBtn">Añadir</button> </div> </header>
+         <section class="price-info"> <div class="price-block"> <div class="value-line"> <span class="price" id="totalInvestment">$0.00</span> </div> <span class="label">Inversión</span> </div> <div class="price-block"> <div class="value-line"> <span class="price" id="totalCapitalization">$0.00</span> <span class="change" id="capitalizationChange"></span> </div> <span class="label">Capitalización</span> </div> </section>
+         <div class="currency-selector-container"> <label>Divisa</label> <select id="currencySelector"> <option value="USD">USD</option> <option value="GTQ">GTQ</option> </select> </div>
+         <main class="chart-area"> <canvas id="stockChart"></canvas> </main>
+         <section class="transaction-list" id="transactionListContainer"> <p class="no-transactions">Desliza transacciones para eliminar/editar.</p> </section>
+         <footer> <p>Datos Históricos</p> </footer>
+         <div id="addTransactionModal" class="modal"> <div class="modal-content"> <span class="close-button" id="closeModalBtn">&times;</span> <h2 id="modalTitle">Añadir Nueva Transacción</h2> <form id="addTransactionForm"> <input type="hidden" id="editTransactionId" name="editTransactionId"> <label for="ticker">Ticker:</label> <input type="text" id="ticker" name="ticker" required maxlength="10"> <label for="assetType">Tipo de Activo:</label> <input type="text" id="assetType" name="assetType" placeholder="Ej: Acción, ETF, Fondo" required> <label for="purchasePrice">Precio de Compra (por acción, en USD):</label> <input type="number" id="purchasePrice" name="purchasePrice" step="0.01" min="0" required> <label for="shares">Acciones:</label> <input type="number" id="shares" name="shares" step="any" min="0" required> <label for="salePrice">Precio de Venta (por acción, en USD, opcional):</label> <input type="number" id="salePrice" name="salePrice" step="0.01" min="0"> <label for="transactionDateTime">Fecha/Hora Transacción:</label> <input type="datetime-local" id="transactionDateTime" name="transactionDateTime" required> <small style="display: block; margin-top: -10px; margin-bottom: 15px; color: var(--text-secondary-color);">Fecha/hora de la compra</small> <div class="modal-actions"> <button type="button" id="cancelModalBtn">Cancelar</button> <button type="submit" class="primary" id="modalSubmitBtn">Añadir Transacción</button> </div> </form> </div> </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const addTransactionBtn = document.getElementById('addTransactionBtn');
+            const removeTransactionBtn = document.getElementById('removeTransactionBtn');
+            const modal = document.getElementById('addTransactionModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const cancelModalBtn = document.getElementById('cancelModalBtn');
+            const addTransactionForm = document.getElementById('addTransactionForm');
+            const transactionListContainer = document.getElementById('transactionListContainer');
+            const totalInvestmentEl = document.getElementById('totalInvestment');
+            const totalCapitalizationEl = document.getElementById('totalCapitalization');
+            const capitalizationChangeEl = document.getElementById('capitalizationChange');
+            const currencySelector = document.getElementById('currencySelector');
+            const chartCanvas = document.getElementById('stockChart');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+            const editTransactionIdInput = document.getElementById('editTransactionId');
+
+            let transactions = [];
+            let currentCurrency = 'USD';
+            let exchangeRates = { USD: 1, GTQ: 7.8 };
+            let stockChart = null;
+            let dragStartX = 0;
+            let currentDragX = 0;
+            let draggedItemElement = null;
+            let draggedItemWrapper = null;
+            let isDragging = false;
+            let editingItemId = null;
+            const swipeThreshold = 75;
+            const dragStartThreshold = 5;
+
+            const EXCHANGE_RATE_API_URL = 'https://api.exchangerate-api.com/v4/latest/USD';
+            const CACHE_DURATION_MS = 60 * 60 * 1000;
+
+            function formatShares(value) { return Number(value.toFixed(4)); }
+            function formatPercentage(value) { if (isNaN(value) || !isFinite(value)) return ''; const sign = value >= 0 ? '+' : ''; return `${sign}${value.toFixed(2)}%`; }
+            function getTransactionResultUSD(tx) { return (tx.salePrice !== null && !isNaN(tx.salePrice)) ? (tx.salePrice * tx.shares) - (tx.purchasePrice * tx.shares) : 0; }
+
+            async function fetchExchangeRates() { const lastFetchTime = localStorage.getItem('exchangeRateFetchTime'); const cachedRates = localStorage.getItem('exchangeRates'); if (cachedRates && lastFetchTime && (Date.now() - parseInt(lastFetchTime)) < CACHE_DURATION_MS) { try { exchangeRates = JSON.parse(cachedRates); return exchangeRates; } catch (e) {} } try { const response = await fetch(EXCHANGE_RATE_API_URL); if (!response.ok) throw new Error(`Error HTTP: ${response.status}`); const data = await response.json(); if (data && data.rates && data.rates.GTQ) { exchangeRates = { USD: 1, GTQ: data.rates.GTQ }; localStorage.setItem('exchangeRates', JSON.stringify(exchangeRates)); localStorage.setItem('exchangeRateFetchTime', Date.now().toString()); return exchangeRates; } else { throw new Error("Formato API inválido"); } } catch (error) { console.error("Fallo fetch tasas:", error); if (cachedRates) { try { exchangeRates = JSON.parse(cachedRates); return exchangeRates; } catch(e) {} } alert("No se pudieron obtener las tasas de cambio. Usando valores por defecto."); return exchangeRates; } }
+            function convertValue(valueInUSD, targetCurrency) { if (isNaN(valueInUSD) || valueInUSD === null) return 0; const rate = exchangeRates[targetCurrency] || 1; return valueInUSD * rate; }
+            function formatCurrency(valueInUSD) {
+                const convertedValue = convertValue(valueInUSD, currentCurrency);
+                const symbol = currentCurrency === 'GTQ' ? 'Q' : '$';
+                if (isNaN(convertedValue)) { return `${symbol}0.00`; }
+                const isNegative = valueInUSD < -0.0001;
+                const absoluteFormattedValue = Math.abs(convertedValue).toFixed(2);
+                return isNegative ? `-${symbol}${absoluteFormattedValue}` : `${symbol}${absoluteFormattedValue}`;
+            }
+            function formatChartAxisValue(valueInUSD) { const convertedValue = convertValue(valueInUSD, currentCurrency); if (isNaN(convertedValue)) return '0'; return convertedValue.toFixed(convertedValue >= 10 || convertedValue <= -10 ? 0 : 2); }
+
+            function loadTransactions() { const storedTransactions = localStorage.getItem('stockTransactions'); if (storedTransactions) { try { transactions = JSON.parse(storedTransactions); transactions.forEach(tx => { tx.dateTime = new Date(tx.dateTime); tx.purchasePrice = parseFloat(tx.purchasePrice); tx.shares = parseFloat(tx.shares); tx.salePrice = tx.salePrice !== null ? parseFloat(tx.salePrice) : null; }); transactions.sort((a, b) => a.dateTime - b.dateTime); } catch (e) { console.error("Error parseando transacciones:", e); transactions = []; localStorage.removeItem('stockTransactions'); } } else { transactions = []; } }
+            function saveTransactions() { transactions.sort((a, b) => a.dateTime - b.dateTime); localStorage.setItem('stockTransactions', JSON.stringify(transactions)); }
+            function findTransactionById(id) { return transactions.find(tx => tx.id === id); }
+            function deleteTransaction(id) { const index = transactions.findIndex(tx => tx.id === id); if (index > -1) { transactions.splice(index, 1); saveTransactions(); updateUI(); } }
+
+            function initializeChart() {
+                if (stockChart) stockChart.destroy();
+                const ctx = chartCanvas.getContext('2d');
+                const gridColor = 'rgba(255, 255, 255, 0.1)';
+                const tickColor = '#a0a0a0';
+                const lineBorderColor = '#26a69a';
+                const gradient = ctx.createLinearGradient(0, 0, 0, 180);
+                gradient.addColorStop(0, 'rgba(38, 166, 154, 0.55)'); gradient.addColorStop(0.8, 'rgba(38, 166, 154, 0.05)'); gradient.addColorStop(1, 'rgba(38, 166, 154, 0.0)');
+                stockChart = new Chart(ctx, { type: 'line', data: { labels: [], datasets: [{ label: `Resultado (${currentCurrency})`, data: [], borderColor: lineBorderColor, borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, pointHitRadius: 10, tension: 0.3, fill: true, backgroundColor: gradient }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false, position: 'right', grid: { color: gridColor, drawBorder: false }, ticks: { color: tickColor, padding: 10, maxTicksLimit: 5, callback: function(value) { return formatChartAxisValue(value); } } }, x: { grid: { display: false, drawBorder: false }, ticks: { color: tickColor, padding: 10, maxRotation: 0, autoSkip: true, maxTicksLimit: 7, callback: function(value) { const date = new Date(this.getLabelForValue(value)); let hour = date.getHours(); hour = hour % 12; hour = hour ? hour : 12; return hour.toString(); } } } }, plugins: { legend: { display: false }, tooltip: { enabled: true, mode: 'index', intersect: false, backgroundColor: 'rgba(0,0,0,0.8)', titleFont: { size: 14 }, bodyFont: { size: 12 }, padding: 10, displayColors: false, callbacks: { label: function(context) { return `Resultado: ${formatCurrency(context.parsed.y)}`; }, title: function(tooltipItems) { const date = new Date(tooltipItems[0].label); return date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short'}); } } } }, interaction: { mode: 'index', axis: 'x', intersect: false } } });
+            }
+            function updateChart() { if (!stockChart) initializeChart(); if (!stockChart) return; const transactionResultsUSD = transactions.map(tx => getTransactionResultUSD(tx)); const chartLabels = transactions.map(tx => tx.dateTime.toISOString()); stockChart.data.labels = chartLabels; stockChart.data.datasets[0].data = transactionResultsUSD; stockChart.data.datasets[0].label = `Resultado (${currentCurrency})`; stockChart.options.scales.y.ticks.color = '#a0a0a0'; stockChart.options.scales.y.grid.color = 'rgba(255, 255, 255, 0.1)'; stockChart.options.scales.x.ticks.color = '#a0a0a0'; stockChart.data.datasets[0].borderColor = '#26a69a'; stockChart.options.scales.y.ticks.callback = function(value) { return formatChartAxisValue(value); }; stockChart.update(); }
+
+             function handleDragStart(event) { if (event.type === 'mousedown' && event.button !== 0) return; const targetItem = event.target.closest('.transaction-item'); if (!targetItem) return; draggedItemElement = targetItem; draggedItemWrapper = targetItem.closest('.transaction-item-wrapper'); dragStartX = event.touches ? event.touches[0].clientX : event.clientX; currentDragX = dragStartX; isDragging = false; }
+             function handleDragMove(event) { if (!draggedItemElement) return; currentDragX = event.touches ? event.touches[0].clientX : event.clientX; const diffX = currentDragX - dragStartX; if (!isDragging && Math.abs(diffX) > dragStartThreshold) { isDragging = true; draggedItemElement.classList.add('dragging'); } if (isDragging) { draggedItemElement.style.transform = `translateX(${diffX}px)`; const background = draggedItemWrapper.querySelector('.transaction-item-swipe-background'); if (background) { const swipeRatio = Math.min(1, Math.abs(diffX) / swipeThreshold); background.style.opacity = swipeRatio; if (diffX > dragStartThreshold) { background.className = 'transaction-item-swipe-background swipe-edit'; background.innerHTML = `<span>EDITAR</span><span></span>`; } else if (diffX < -dragStartThreshold) { background.className = 'transaction-item-swipe-background swipe-delete'; background.innerHTML = `<span></span><span>ELIMINAR</span>`; } else { background.style.opacity = 0; } } } }
+             function handleDragEnd(event) { if (!isDragging) { resetDragState(); return; } const diffX = currentDragX - dragStartX; const transactionId = draggedItemWrapper.dataset.id; if (diffX > swipeThreshold) { editingItemId = transactionId; openEditModal(transactionId); } else if (diffX < -swipeThreshold) { if (confirm(`¿Seguro que quieres eliminar esta transacción?`)) { draggedItemWrapper.style.transition = 'height 0.2s ease-out, opacity 0.2s ease-out'; draggedItemWrapper.style.height = '0px'; draggedItemWrapper.style.opacity = '0'; setTimeout(() => { deleteTransaction(transactionId); }, 200); } else { snapBack(draggedItemElement); } } else { snapBack(draggedItemElement); } resetDragState(); }
+             function resetDragState() { if (draggedItemElement) { draggedItemElement.classList.remove('dragging'); } isDragging = false; draggedItemElement = null; draggedItemWrapper = null; dragStartX = 0; currentDragX = 0; }
+             function snapBack(item) { if (!item) return; item.style.transform = 'translateX(0px)'; const wrapper = item.closest('.transaction-item-wrapper'); if (wrapper) { const background = wrapper.querySelector('.transaction-item-swipe-background'); if (background) background.style.opacity = 0; } }
+             function attachSwipeListeners(wrapperElement) { wrapperElement.addEventListener('touchstart', handleDragStart, { passive: true }); wrapperElement.addEventListener('touchmove', handleDragMove, { passive: false }); wrapperElement.addEventListener('touchend', handleDragEnd); wrapperElement.addEventListener('touchcancel', handleDragEnd); wrapperElement.addEventListener('mousedown', handleDragStart); }
+             document.addEventListener('mousemove', (e) => { if(isDragging) handleDragMove(e); }); document.addEventListener('mouseup', (e) => { if(isDragging) handleDragEnd(e); });
+
+             function openAddModal() { modalTitle.textContent = "Añadir Nueva Transacción"; modalSubmitBtn.textContent = "Añadir"; addTransactionForm.reset(); editTransactionIdInput.value = ''; editingItemId = null; const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); document.getElementById('transactionDateTime').value = now.toISOString().slice(0, 16); modal.style.display = 'flex'; }
+             function openEditModal(transactionId) { const tx = findTransactionById(transactionId); if (!tx) return; modalTitle.textContent = "Editar Transacción"; modalSubmitBtn.textContent = "Actualizar"; addTransactionForm.reset(); editTransactionIdInput.value = tx.id; document.getElementById('ticker').value = tx.ticker; document.getElementById('assetType').value = tx.assetType; document.getElementById('purchasePrice').value = tx.purchasePrice; document.getElementById('shares').value = tx.shares; document.getElementById('salePrice').value = tx.salePrice ?? ''; const localDateTime = new Date(tx.dateTime.getTime() - (tx.dateTime.getTimezoneOffset() * 60000)).toISOString().slice(0, 16); document.getElementById('transactionDateTime').value = localDateTime; modal.style.display = 'flex'; }
+             function closeModal() { modal.style.display = 'none'; if (editingItemId) { const wrapperToSnap = transactionListContainer.querySelector(`.transaction-item-wrapper[data-id="${editingItemId}"]`); if (wrapperToSnap) { const itemToSnap = wrapperToSnap.querySelector('.transaction-item'); snapBack(itemToSnap); } } editingItemId = null; }
+
+            function updateUI() { transactionListContainer.innerHTML = ''; const latestTransactions = transactions.slice(-3); const displayTransactions = latestTransactions.reverse(); if (transactions.length === 0) { transactionListContainer.innerHTML = '<p class="no-transactions">Desliza transacciones para eliminar/editar.</p>'; } else { displayTransactions.forEach(tx => { const resultUSD = getTransactionResultUSD(tx); let resultClass = 'neutral'; if (resultUSD > 0.001) resultClass = 'positive'; else if (resultUSD < -0.001) resultClass = 'negative'; const wrapper = document.createElement('div'); wrapper.classList.add('transaction-item-wrapper'); wrapper.dataset.id = tx.id; const swipeBg = document.createElement('div'); swipeBg.className = 'transaction-item-swipe-background'; swipeBg.style.opacity = 0; wrapper.appendChild(swipeBg); const item = document.createElement('div'); item.classList.add('transaction-item'); item.innerHTML = `<span>${tx.ticker.toUpperCase()}</span><span class="result ${resultClass}">${formatCurrency(resultUSD)}</span><span>Acciones</span><span>${formatShares(tx.shares)}</span>`; wrapper.appendChild(item); transactionListContainer.appendChild(wrapper); attachSwipeListeners(wrapper); }); } let totalInvestmentUSD = transactions.reduce((sum, tx) => sum + (tx.purchasePrice * tx.shares), 0); let totalCapitalizationUSD = transactions.reduce((sum, tx) => sum + (tx.salePrice !== null && !isNaN(tx.salePrice) ? tx.salePrice * tx.shares : 0), 0); totalInvestmentEl.textContent = formatCurrency(totalInvestmentUSD); totalCapitalizationEl.textContent = formatCurrency(totalCapitalizationUSD); let capPercentage = totalInvestmentUSD !== 0 ? ((totalCapitalizationUSD / totalInvestmentUSD) - 1) * 100 : 0; capitalizationChangeEl.textContent = formatPercentage(capPercentage); capitalizationChangeEl.className = 'change'; if (capPercentage > 0.01) capitalizationChangeEl.classList.add('positive'); else if (capPercentage < -0.01) capitalizationChangeEl.classList.add('negative'); updateChart(); }
+
+            addTransactionBtn.addEventListener('click', openAddModal);
+            removeTransactionBtn.addEventListener('click', () => { if (transactions.length === 0) { alert("No hay transacciones para eliminar."); return; } if (confirm("¿Seguro que quieres eliminar TODAS las transacciones? Esta acción no se puede deshacer.")) { transactions = []; saveTransactions(); updateUI(); } });
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelModalBtn.addEventListener('click', closeModal);
+            window.addEventListener('click', (event) => { if (event.target === modal) { closeModal(); } });
+            addTransactionForm.addEventListener('submit', (event) => { event.preventDefault(); const formData = new FormData(event.target); const editId = formData.get('editTransactionId'); const transactionData = { ticker: formData.get('ticker').trim().toUpperCase(), assetType: formData.get('assetType').trim(), purchasePrice: parseFloat(formData.get('purchasePrice')), shares: parseFloat(formData.get('shares')), salePrice: formData.get('salePrice') ? parseFloat(formData.get('salePrice')) : null, dateTime: new Date(formData.get('transactionDateTime')) }; if (!transactionData.ticker || isNaN(transactionData.purchasePrice) || isNaN(transactionData.shares) || !transactionData.dateTime || isNaN(transactionData.dateTime.getTime())) { alert("Por favor, rellena todos los campos correctamente."); return; } if (editId) { const index = transactions.findIndex(tx => tx.id === editId); if (index > -1) { transactions[index] = { ...transactions[index], ...transactionData }; } else { console.error("ID no encontrado para editar:", editId); alert("Error al actualizar."); return; } } else { transactionData.id = Date.now().toString(); transactions.push(transactionData); } saveTransactions(); updateUI(); closeModal(); });
+            currencySelector.addEventListener('change', async (event) => { currentCurrency = event.target.value; localStorage.setItem('selectedCurrency', currentCurrency); await fetchExchangeRates(); updateUI(); });
+
+            async function initializeApp() { currentCurrency = localStorage.getItem('selectedCurrency') || 'USD'; currencySelector.value = currentCurrency; loadTransactions(); initializeChart(); await fetchExchangeRates(); updateUI(); }
+            initializeApp();
+        });
+    </script>
+</body>
+</html>
