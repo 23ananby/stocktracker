@@ -6,38 +6,41 @@
     <title>Stock Market Tracker</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600&family=Poppins:wght@100;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600&family=Poppins:wght@100;300;400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
-            --bg-color: #1e1e1e;
+            --bg-color: #0a0a0a;
             --text-color: #e0e0e0;
             --text-secondary-color: #a0a0a0;
             --positive-color: #26a69a;
             --negative-color: #ef5350;
             --neutral-color: var(--text-secondary-color);
-            --border-color: #444;
-            --button-bg: #333;
-            --button-hover-bg: #444;
-            --chart-grid-color-val: rgba(255, 255, 255, 0.1);
+            --border-color: #333;
+            --button-bg: #222;
+            --button-hover-bg: #333;
+            --chart-grid-color-val: rgba(255, 255, 255, 0.08);
             --chart-line-color-val: #26a69a;
             --chart-tick-color-val: #a0a0a0;
             --font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            --modal-bg: rgba(0, 0, 0, 0.7);
-            --modal-content-bg: #2a2a2a;
+            --modal-bg: rgba(0, 0, 0, 0.8);
+            --modal-content-bg: #181818;
             --swipe-delete-bg: var(--negative-color);
             --swipe-edit-bg: var(--positive-color);
             --link-color: #42a5f5;
-            --card-skin-default-bg: linear-gradient(160deg, #404040, #2d2d2d);
-            --card-glass-effect-bg: rgba(45, 45, 45, 0.6);
+            --card-skin-default-bg: linear-gradient(160deg, #252525, #111);
+            --card-glass-effect-bg: rgba(25, 25, 25, 0.6);
             --card-glass-border: rgba(255, 255, 255, 0.1);
-            --download-section-bg: #000000; /* Fondo negro */
+            --download-section-bg: #000000;
             --download-title-color: #ffffff;
             --download-subtitle-color: #b0b0b0;
             --download-button-grad-start: #f90303;
             --download-button-grad-end: #ff46cd;
             --download-button-text: #ffffff;
+            --footer-bg: #000000;
+            --footer-text-color: #b0b0b0;
+            --live-blue-color: #0066ff;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -46,10 +49,10 @@
             color: var(--text-color);
             font-family: var(--font-family);
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: column; /* Ensure footer is at the bottom */
+            align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 20px 20px 0 20px; /* Remove bottom padding to let footer touch bottom */
             font-size: 14px;
             perspective: 1000px;
         }
@@ -57,6 +60,7 @@
             max-width: 400px;
             width: 100%;
             overflow: visible;
+            flex-grow: 1; /* Allow container to grow */
         }
         header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
         .header-main { flex-grow: 1; } .header-main h1 { font-size: 2.5em; font-weight: bold; line-height: 1; margin-bottom: 2px; } .header-main p { color: var(--text-secondary-color); font-size: 0.9em; }
@@ -93,7 +97,9 @@
         .transaction-item span:nth-child(3) { color: var(--text-secondary-color); font-size: 0.85em; }
         .transaction-item span:nth-child(4) { text-align: right; font-weight: 500; min-width: 50px; }
         .no-transactions { color: var(--text-secondary-color); text-align: center; padding: 20px 0; font-style: italic; }
-        footer p { color: var(--link-color); font-size: 0.9em; display: block; text-align: left; margin-top: 10px; margin-bottom: 15px; }
+
+        .section-divider { color: var(--link-color); font-size: 0.9em; display: block; text-align: left; margin-top: 10px; margin-bottom: 15px; }
+
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: var(--modal-bg); align-items: center; justify-content: center; } .modal-content { background-color: var(--modal-content-bg); margin: auto; padding: 25px; border: 1px solid var(--border-color); width: 80%; max-width: 450px; border-radius: 8px; color: var(--text-color); box-shadow: 0 5px 15px rgba(0,0,0,0.5); } .modal-content h2 { margin-top: 0; margin-bottom: 20px; font-weight: 500; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; } .modal-content label { display: block; margin-bottom: 5px; font-size: 0.9em; color: var(--text-secondary-color); } .modal-content input[type="text"], .modal-content input[type="number"], .modal-content input[type="datetime-local"], .modal-content select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 4px; background-color: var(--button-bg); color: var(--text-color); font-size: 1em; } .modal-content input[type="number"]::-webkit-inner-spin-button, .modal-content input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; } .modal-content input[type="number"] { -moz-appearance: textfield; } .modal-actions { text-align: right; margin-top: 20px; } .modal-actions button { background-color: var(--button-bg); color: var(--text-color); border: none; padding: 10px 18px; border-radius: 5px; cursor: pointer; font-size: 0.9em; margin-left: 10px; transition: background-color 0.2s ease; } .modal-actions button.primary { background-color: var(--positive-color); color: #fff; } .modal-actions button.primary:hover { background-color: #1e8e84; } .modal-actions button:hover { background-color: var(--button-hover-bg); } .close-button { color: var(--text-secondary-color); float: right; font-size: 24px; font-weight: bold; line-height: 1; cursor: pointer; margin-top: -10px; } .close-button:hover, .close-button:focus { color: var(--text-color); text-decoration: none; }
 
         .finance-card {
@@ -102,7 +108,7 @@
             color: var(--text-color);
             position: relative;
             margin-bottom: 25px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6); /* Darker shadow for black bg */
             overflow: hidden;
             font-family: var(--font-family);
             user-select: none;
@@ -143,47 +149,52 @@
         .download-section {
             background-color: var(--download-section-bg);
             border-radius: 8px;
-            padding: 25px 20px; /* Más padding vertical */
-            margin-top: 20px; /* Mayor separación */
+            padding: 25px 20px;
+            margin-top: 20px;
             color: var(--text-color);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px; /* Match container width */
+            margin-left: auto; /* Center align if needed */
+            margin-right: auto;
+            margin-bottom: 30px; /* Add space before the final footer */
         }
         .download-section .text-content {
-            margin-bottom: 20px; /* Espacio antes del botón */
+            margin-bottom: 20px;
         }
         .download-section .title {
-            font-size: 2.2em; /* Tamaño del título */
+            font-size: 2.2em;
             color: var(--download-title-color);
             margin-bottom: 5px;
             line-height: 1.2;
         }
         .download-section .title .archivo {
             font-family: 'Nunito', sans-serif;
-            font-weight: 600; /* Semibold */
+            font-weight: 600;
         }
         .download-section .title .xlsx {
             font-family: 'Poppins', sans-serif;
-            font-weight: 100; /* Thin */
-            margin-left: 8px; /* Espacio entre palabras */
+            font-weight: 100;
+            margin-left: 8px;
         }
         .download-section .subtitle {
             font-size: 0.9em;
             color: var(--download-subtitle-color);
-            margin-bottom: 0; /* Sin espacio extra debajo */
+            margin-bottom: 0;
             font-weight: 400;
             letter-spacing: 0.3px;
-            font-family: var(--font-family); /* Usar fuente base */
+            font-family: var(--font-family);
         }
         .download-section .download-button {
-            display: inline-block; /* Para que el botón no ocupe todo el ancho */
+            display: inline-block;
             background: linear-gradient(90deg, var(--download-button-grad-start) 0%, var(--download-button-grad-end) 100%);
             color: var(--download-button-text);
             border: none;
-            border-radius: 25px; /* Más redondeado (pill shape) */
-            padding: 10px 25px; /* Padding del botón */
+            border-radius: 25px;
+            padding: 10px 25px;
             font-family: 'Poppins', sans-serif;
             font-size: 0.95em;
-            font-weight: 700; /* Bold */
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             cursor: pointer;
@@ -191,7 +202,6 @@
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
         }
         .download-section .download-button:hover {
-             /* Podríamos añadir un ligero brillo o cambio si se desea */
              filter: brightness(1.1);
         }
         .download-section .download-button:active {
@@ -199,15 +209,58 @@
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
         }
 
+        .final-footer {
+            background-color: var(--footer-bg);
+            color: var(--footer-text-color);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300; /* Poppins Light */
+            padding: 50px 20px 40px 20px;
+            text-align: center;
+            width: 100vw; /* Full viewport width */
+            margin-top: auto; /* Push to bottom */
+            box-sizing: border-box; /* Include padding in width */
+            font-size: 0.8em; /* Smaller base font for footer */
+            line-height: 1.6;
+        }
+        .final-footer .footer-title {
+            font-size: 2.5em; /* Adjust size as needed */
+            margin-bottom: 10px;
+            color: var(--text-color); /* Use main text color for title */
+        }
+        .final-footer .footer-title .stock-market {
+            font-weight: 300; /* Poppins Light */
+        }
+        .final-footer .footer-title .live {
+            font-weight: 400; /* Poppins Regular */
+            color: var(--live-blue-color);
+        }
+        .final-footer .corp-name {
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary-color); /* Use secondary text color */
+        }
+        .final-footer .copyright {
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+
         @media (min-width: 600px) {
             body { font-size: 15px; }
             .header-main h1 { font-size: 2.8em; }
+            .final-footer { font-size: 0.85em; }
+            .final-footer .footer-title { font-size: 3em; }
         }
         @media (min-width: 1024px) {
-             body { font-size: 16px; padding: 30px; }
+             body { font-size: 16px; padding: 30px 30px 0 30px; }
              .container { max-width: 450px; }
              .finance-card .card-balance-primary #totalCapitalization { font-size: 2.5em; }
+             .download-section { max-width: 450px; }
              .download-section .title { font-size: 2.4em; }
+             .final-footer { font-size: 0.9em; }
+             .final-footer .footer-title { font-size: 3.2em; }
         }
 
     </style>
@@ -260,9 +313,7 @@
              <p class="no-transactions">Desliza transacciones para eliminar/editar.</p>
          </section>
 
-         <footer>
-             <p>Datos Históricos</p>
-         </footer>
+         <p class="section-divider">Datos Históricos</p>
 
          <section class="download-section">
             <div class="text-content">
@@ -301,6 +352,16 @@
              </div>
          </div>
     </div>
+
+    <footer class="final-footer">
+        <div class="footer-title">
+            <span class="stock-market">Stock Market</span> <span class="live">LIVE</span>
+        </div>
+        <div class="corp-name">ANDRÉS BUSINESS CORP.</div>
+        <div class="copyright">
+            © 2025 Stock Market Tracker Live. Todos los derechos reservados. Este software está licenciado bajo la Licencia Apache 2.0. Se distribuye "TAL CUAL", SIN GARANTÍAS NI CONDICIONES DE NINGÚN TIPO, ya sean expresas o implícitas, incluyendo, sin limitación, garantías de comerciabilidad o idoneidad para un propósito particular. El uso no autorizado, la reproducción o la distribución pueden resultar en severas sanciones legales. Consulte el archivo LICENSE para los términos completos, permisos y restricciones. Proceda con estricta adherencia a las disposiciones legales.
+        </div>
+    </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -385,10 +446,10 @@
                         try {
                             exchangeRates = JSON.parse(cachedRates);
                             return exchangeRates;
-                        } catch(e) { /* Ignore error */ }
+                        } catch(e) {  }
                     }
                     exchangeRates = { USD: 1, GTQ: 7.8 };
-                    alert("No se pudieron obtener las tasas de cambio actuales. Usando valores por defecto (1 USD = 7.8 GTQ).");
+                    console.warn("No se pudieron obtener las tasas de cambio actuales. Usando valores por defecto (1 USD = 7.8 GTQ).");
                     return exchangeRates;
                 }
             }
@@ -788,6 +849,7 @@
                 }
 
                 if (typeof XLSX === 'undefined') {
+                    console.error("Error: La librería de exportación (SheetJS) no se cargó correctamente.");
                     alert("Error: La librería de exportación (SheetJS) no se cargó correctamente.");
                     return;
                 }
@@ -809,6 +871,7 @@
                     XLSX.writeFile(workbook, "historial_transacciones.xlsx");
 
                 } catch (error) {
+                    console.error("Ocurrió un error al intentar generar el archivo de historial:", error);
                     alert("Ocurrió un error al intentar generar el archivo de historial.");
                 }
             }
