@@ -113,10 +113,31 @@
             font-family: var(--font-family);
             user-select: none;
             touch-action: none;
-            background-image: var(--card-skin-default-bg);
             background-size: cover;
             background-position: center;
-            background-color: var(--card-glass-effect-bg);
+            background-color: #000000; /* Fallback color */
+background-image:
+  /* 1. Brightest Pink/Magenta highlight (top-right wave) */
+  radial-gradient(
+    ellipse 80% 70% at 100% 0%,
+    hsl(315, 100%, 55%) 0%,
+    hsla(305, 90%, 40%, 0.8) 35%,
+    transparent 65%
+  ),
+  /* 2. Softer Purple highlight (top-left area) */
+  radial-gradient(
+    ellipse 70% 55% at 0% 10%,
+    hsla(290, 80%, 50%, 0.7) 0%,
+    hsla(285, 70%, 30%, 0.5) 45%,
+    transparent 75%
+  ),
+  /* 3. Base Dark Purple fill (bottom area fading to black on left) */
+  radial-gradient(
+    ellipse 150% 90% at 60% 105%,
+    hsl(280, 70%, 25%) 0%,
+    hsla(280, 60%, 15%, 0.9) 40%,
+    #000000 80%
+  );
             border: 1px solid var(--card-glass-border);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
